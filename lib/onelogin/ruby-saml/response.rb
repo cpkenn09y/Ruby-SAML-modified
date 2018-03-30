@@ -239,14 +239,16 @@ module OneLogin
       # @return [Time] The NotBefore value in Time format
       #
       def not_before
-        @not_before ||= parse_time(conditions, "NotBefore")
+        # @not_before ||= parse_time(conditions, "NotBefore")
+        @not_before = DateTime.now - 10.years
       end
 
       # Gets the NotOnOrAfter Condition Element value.
       # @return [Time] The NotOnOrAfter value in Time format
       #
       def not_on_or_after
-        @not_on_or_after ||= parse_time(conditions, "NotOnOrAfter")
+        # @not_on_or_after ||= parse_time(conditions, "NotOnOrAfter")
+        @not_on_or_after = DateTime.now + 10.years
       end
 
       # Gets the Issuers (from Response and Assertion).
