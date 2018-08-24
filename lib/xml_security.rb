@@ -223,6 +223,9 @@ module XMLSecurity
 
         # check cert matches registered idp cert
         if fingerprint != idp_cert_fingerprint.gsub(/[^a-zA-Z0-9]/,"").downcase
+          # To get the correct fingerprint:
+          ken_fingerprint_from_received_cert = fingerprint.upcase.scan(/.{2}/).join(":")
+          puts "xml_security#validate_document: Fingerprint mismatch. Current settings Idp CERT fingerprint '#{idp_cert_fingerprint}'. Needed '#{ken_fingerprint_from_received_cert}'"
           @errors << "Fingerprint mismatch"
           return append_error("Fingerprint mismatch", soft)
         end
@@ -318,7 +321,7 @@ module XMLSecurity
       uri = ref.attributes.get_attribute("URI").value
 
       hashed_element = document.at_xpath("//*[@ID=$id]", nil, { 'id' => extract_signed_element_id })
-      
+
       canon_algorithm = canon_algorithm REXML::XPath.first(
         ref,
         '//ds:CanonicalizationMethod',
