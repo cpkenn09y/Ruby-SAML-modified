@@ -738,13 +738,15 @@ module OneLogin
 
           attrs = confirmation_data_node.attributes
           next if (attrs.include? "InResponseTo" and attrs['InResponseTo'] != in_response_to) ||
-                  (attrs.include? "NotOnOrAfter" and (parse_time(confirmation_data_node, "NotOnOrAfter") + allowed_clock_drift) <= now) ||
-                  (attrs.include? "NotBefore" and parse_time(confirmation_data_node, "NotBefore") > (now + allowed_clock_drift)) ||
+                  # Ken: Ignore this for now... This makes it so that we ignore the expiration code
+                  # (attrs.include? "NotOnOrAfter" and (parse_time(confirmation_data_node, "NotOnOrAfter") + allowed_clock_drift) <= now) ||
+                  # (attrs.include? "NotBefore" and parse_time(confirmation_data_node, "NotBefore") > (now + allowed_clock_drift)) ||
                   (attrs.include? "Recipient" and !options[:skip_recipient_check] and settings and attrs['Recipient'] != settings.assertion_consumer_service_url)
 
           valid_subject_confirmation = true
           break
         end
+
 
         if !valid_subject_confirmation
           error_msg = "A valid SubjectConfirmation was not found on this Response"
@@ -781,7 +783,8 @@ module OneLogin
       #
       def validate_signature
         error_msg = "Invalid Signature on SAML Response"
-
+        # puts "Ken: Bind here to investigate validating the signature"
+        # binding.pry
         # If the response contains the signature, and the assertion was encrypted, validate the original SAML Response
         # otherwise, review if the decrypted assertion contains a signature
         sig_elements = REXML::XPath.match(
@@ -816,6 +819,8 @@ module OneLogin
           fingerprint = settings.get_fingerprint
 
           unless fingerprint && doc.validate_document(fingerprint, @soft, opts)
+            # Ken: Binding here means that the fingerprint did not match the expected
+            # binding.pry
             return append_error(error_msg)
           end
         else
