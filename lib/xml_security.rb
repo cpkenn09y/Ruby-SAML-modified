@@ -204,7 +204,6 @@ module XMLSecurity
         "//ds:X509Certificate",
         { "ds"=>DSIG }
       )
-
       if cert_element
         base64_cert = cert_element.text
         cert_text = Base64.decode64(base64_cert)
@@ -223,6 +222,7 @@ module XMLSecurity
 
         # check cert matches registered idp cert
         if fingerprint != idp_cert_fingerprint.gsub(/[^a-zA-Z0-9]/,"").downcase
+          # binding.pry
           # To get the correct fingerprint:
           ken_fingerprint_from_received_cert = fingerprint.upcase.scan(/.{2}/).join(":")
           puts "xml_security#validate_document: Fingerprint mismatch. Current settings Idp CERT fingerprint '#{idp_cert_fingerprint}'. Needed '#{ken_fingerprint_from_received_cert}'"
